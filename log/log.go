@@ -5,6 +5,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/cirrocloud/structured/report"
 	"github.com/sirupsen/logrus"
 )
 
@@ -165,6 +166,51 @@ func WithFields(f Fields) *Entry {
 		Logger: defaultLogger,
 		Data:   f,
 	}
+}
+
+// Rep import report data from report.Reportables
+func (e *Entry) Rep(rep report.Reportables) *Entry {
+	return e.WithReport(rep)
+}
+
+// Rep import report data from report.Reportables
+func Rep(rep report.Reportables) *Entry {
+	return WithReport(rep)
+}
+
+func (e *Entry) WithReport(rep report.Reportables) *Entry {
+	switch defaultLogger.Handler.Level.String() {
+	case "debug":
+		return e.WithDetailedReport(rep)
+	default:
+		return e.WithShortReport(rep)
+	}
+}
+
+func WithReport(rep report.Reportables) *Entry {
+	switch defaultLogger.Handler.Level.String() {
+	case "debug":
+		return WithDetailedReport(rep)
+	default:
+		return WithShortReport(rep)
+	}
+}
+
+func (e *Entry) WithShortReport(rep report.Reportables) *Entry {
+	return e.WithFields(Fields(rep.ShortReport()))
+}
+
+func WithShortReport(rep report.Reportables) *Entry {
+	return WithFields(Fields(rep.ShortReport()))
+
+}
+
+func (e *Entry) WithDetailedReport(rep report.Reportables) *Entry {
+	return e.WithFields(Fields(rep.DetailedReport()))
+}
+
+func WithDetailedReport(rep report.Reportables) *Entry {
+	return WithFields(Fields(rep.DetailedReport()))
 }
 
 type keyvalser interface {

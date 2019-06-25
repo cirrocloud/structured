@@ -5,6 +5,7 @@ package errors
 import (
 	"fmt"
 
+	"github.com/cirrocloud/structured/report"
 	jerror "github.com/jjeffery/errors"
 )
 
@@ -19,6 +20,14 @@ type keyvalser interface {
 
 func New(s string) Error {
 	return jerror.New(s)
+}
+
+func Rep(rep report.Reportables) Context {
+	return WithReport(rep)
+}
+
+func WithReport(rep report.Reportables) Context {
+	return WithFields(Fields(rep.DetailedReport()))
 }
 
 func With(keyvals ...interface{}) Context {
